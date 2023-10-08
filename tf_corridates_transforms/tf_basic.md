@@ -6,6 +6,8 @@ https://blog.csdn.net/sinat_16643223/article/details/113919768
 <br>
 https://blog.csdn.net/qq_43481884/article/details/105429655
 
+### 各种frame介绍
+
 1. ROS中base_link, odom, fixed_frame, target_frame和虚拟大地图map的关系
 一般在urdf文件中都要定义base_link，它代表了机器人的主干，其它所有的frame都是相对于base_link定义并粘在一起的。它们一起相对于大地图map移动，让机器人移动就是向tf发布 geometry_msgs::TransformStamped 消息通知ros base_linke相对于map的tf转换关系。先看一下这几个概念在ros中的定义：
 
