@@ -33,7 +33,7 @@ target_frame: Rviz中视觉跟踪的frame是 target_frame;
 
 
 
-##两个相对位置不变的坐标系之间可以采用如下方式进行变换
+## 两个相对位置不变的坐标系之间可以采用如下方式进行变换
 将以下代码加入到.launch文件中，args="x y z r p y patent_frame child_frame ms"， xyz表示子坐标系在父坐标系为参考下的坐标。
 ‘<!-- 坐标系之间关系设置 -->
 <node pkg="tf" type="static_transform_publisher" name="tf_map_odom" args="0 0 0 0 0 0 map odom 100"/>
