@@ -17,6 +17,11 @@ http://wiki.ros.org/tf/Tutorials/Time%20travel%20with%20tf%20%28Python%29
 https://www.guyuehome.com/35890
 <br>
 
+### 坐标变换简介
+坐标转换是空间实体的位置描述，是从一种坐标系统变换到另一种坐标系统的过程。通过建立两个坐标系统之间一一对应关系来实现。通常坐标转换有平移、缩放、旋转三个方面的转换。
+![image](https://github.com/Luyao0LIU/ROS_Tutorials/assets/128677149/40f2dbe4-2dbd-4d10-8191-1a761a2f5342)
+A、B两个坐标系A坐标系下的位姿可以通过平移和旋转变换成B坐标系下的位姿这里的平移和旋转可以通过4×4的变换矩阵来描述。
+
 
 ### 各种frame之间的关系介绍
 
