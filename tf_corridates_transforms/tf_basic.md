@@ -77,18 +77,27 @@ target_frame: Rviz中视觉跟踪的frame是 target_frame;
 可以使用ROS官方自带的工具，运行如下命令
 
 **tf_monitor**
+
 tf_monitor工具的功能是打印TF树中所有坐标系的发布状态
+
 `tf_monitor <source_frame> <target_target>`
+
 tf_monitor工具查看TF树中所有坐标系的发布状态
 
 **tf_echo**
+
 tf_echo工具的功能是查看指定坐标系之间的变换关系
+
 `tf_echo <source_frame> <target_frame>`
 
 **static_transform_publisher**
+
 static_transform_publisher工具的功能是发布两个坐标系之间的静态坐标变换这两个坐标系不发生相对位置变化
+
 `static_transform_publisher x y z yaw pitch roll frame_id child_frame_id period_in_ms`
+
 `static_tra nsform_publisher x y z qx qy qz qw frame_id child_frame_id period_in_ms`
+
 该命令不仅可以在终端中使用还可以在launch文件中使用
 
 ```xml
@@ -98,6 +107,7 @@ static_transform_publisher工具的功能是发布两个坐标系之间的静态
 ```
 
 **view_frames**
+
 view_frames是可视化的调试工具可以生成pdf文件显示整棵TF树的信息。
 
 ```xml
