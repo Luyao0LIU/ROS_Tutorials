@@ -32,7 +32,7 @@ map到base_link的坐标转换是被定位模块计算出来的. 但定位模块
 fixed_frame: RViz中认定的大世界就是fixed_frame;
 target_frame: Rviz中视觉跟踪的frame是 target_frame;
 
-```
+```xml
 <launch>  
     <arg name="model" />  
     <arg name="gui" default="False" />  
