@@ -32,15 +32,15 @@ map到base_link的坐标转换是被定位模块计算出来的. 但定位模块
 fixed_frame: RViz中认定的大世界就是fixed_frame;
 target_frame: Rviz中视觉跟踪的frame是 target_frame;
 
-‘<launch>  
-<arg name="model" />  
+    <launch>  
+    <arg name="model" />  
     <arg name="gui" default="False" />  
     <param name="robot_description" textfile="$(arg model)" />  
     <param name="use_gui" value="$(arg gui)"/>  
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />  
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find sp1s)/urdf.rviz" required="true" />  
-</launch>’
+    </launch>
 
 “robot_description” 参数定义了urdf文件的路径，它被 robot_state_publisher节点使用。该节点解析urdf文件后将各个frame的状态发布给tf. 因此在rviz里面就看到各个frame(link)之间的tf转换显示OK.否则会显示warning.
 "joint_state_publisher"节点获取urdf里面定义的rotate link并发布坐标转换给tf.否则会显示warning. 注意:“joint_state_publisher” 是python写的，只支持ascii编码，不支持Unicode.
