@@ -174,13 +174,65 @@ void pointcloud_pub_sub::publish()
 总结
 
 pcl库是一个强大的点云处理库，在c++中使用极其方便，而python版本中因为笔者没有安装python-pcl（也是为了追求多样性），代码看起来略显繁杂。
-
 同时，c++版本中也展示了ros中sensor_msgs::PointCloud2格式与pcl中pcl::PointCloud、pcl::PointCloud的相互转换方法，请读者留意。
 
 参考：https://blog.csdn.net/k_NGU_L/article/details/119541055
 
 
+# (2) 在ROS中发布彩色点云-python
+参考：https://blog.csdn.net/qq_44992157/article/details/130662947
 
+
+```python
+import rospy
+import sensor_msgs.point_cloud2 as pc2
+from sensor_msgs.msg import PointCloud2, PointField
+
+def publish_colored_point_cloud(points, colors):
+    assert len(points) == len(colors), "Points and colors must have the same length"
+
+    # 创建PointCloud2消息
+    msg = PointCloud2()
+    msg.header.stamp = rospy.Time.now()
+    msg.header.frame_id = 'your_frame_id'
+    msg.height = 1
+    msg.width = len(points)
+    msg.is_dense = True
+
+    fields = [
+        PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
+        PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
+        PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
+        PointField(name='rgb', offset=12, datatype=PointField.UINT32, count=1)
+    ]
+    msg.fields = fields
+
+    # 将点和颜色信息填充到消息中
+    point_data = []
+    for i in range(len(points)):
+        x, y, z = points[i]
+        r, g, b = colors[i]
+        rgb = (int(r) << 16) | (int(g) << 8) | int(b)
+        point_data.append([x, y, z, rgb])
+
+    msg.data = np.asarray(point_data, dtype=np.float32).tobytes()
+
+    # 发布消息
+    pub.publish(msg)
+
+if __name__ == '__main__':
+    rospy.init_node('colored_point_cloud_publisher')
+    pub = rospy.Publisher('/colored_point_cloud', PointCloud2, queue_size=1)
+
+    # 假设您有点和颜色数据
+    points = [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]  # 点的位置
+    colors = [[255, 0, 0], [0, 255, 0]]  # 点的颜色
+
+    while not rospy.is_shutdown():
+        publish_colored_point_cloud(points, colors)
+        rospy.sleep(1.0)
+
+```
 
 
 
