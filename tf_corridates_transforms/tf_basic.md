@@ -27,6 +27,7 @@ A、B两个坐标系A坐标系下的位姿可以通过平移和旋转变换成B�
 
 **TF坐标变换如何实现？**
 监听TF变换：接收并缓存系统中发布的所有坐标变换数据并从中查询所需要的坐标变换关系。
+
 广播TF变换：向系统中广播坐标系之间的坐标变换关系。系统中可能会存在多个不同部分的TF变换广播每个广播都可以直接将坐标变换关系插入TF树中不需要再进行同步。
 
 
@@ -71,13 +72,37 @@ target_frame: Rviz中视觉跟踪的frame是 target_frame;
 “robot_description” 参数定义了urdf文件的路径，它被 robot_state_publisher节点使用。该节点解析urdf文件后将各个frame的状态发布给tf. 因此在rviz里面就看到各个frame(link)之间的tf转换显示OK.否则会显示warning.
 "joint_state_publisher"节点获取urdf里面定义的rotate link并发布坐标转换给tf.否则会显示warning. 注意:“joint_state_publisher” 是python写的，只支持ascii编码，不支持Unicode.
 
-### 如何查看当前各个frames之间的转换关系
+### TF工具 如何查看当前各个frames之间的转换关系
 可以使用ROS官方自带的工具，运行如下命令
+
+**tf_monitor**
+tf_monitor工具的功能是打印TF树中所有坐标系的发布状态
+`tf_monitor <source_frame> <target_target>`
+tf_monitor工具查看TF树中所有坐标系的发布状态
+
+**tf_echo**
+tf_echo工具的功能是查看指定坐标系之间的变换关系
+`tf_echo <source_frame> <target_frame>`
+
+**static_transform_publisher**
+static_transform_publisher工具的功能是发布两个坐标系之间的静态坐标变换这两个坐标系不发生相对位置变化
+`static_transform_publisher x y z yaw pitch roll frame_id child_frame_id period_in_ms`
+`static_tra nsform_publisher x y z qx qy qz qw frame_id child_frame_id period_in_ms`
+该命令不仅可以在终端中使用还可以在launch文件中使用
+
+```xml
+<launch>
+  <node pk g="tf" type="static_transform_publisher" name="link1_broadcaster"args="1 0 0 0 0 0 1 link1_parent link1 100" />
+</launch>
+```
+
+**view_frames**
+view_frames是可视化的调试工具可以生成pdf文件显示整棵TF树的信息。
 
 ```xml
 rosrun tf2_tools view_frames.py
 ```
-
+使用如下命令或者使用pdf阅读器查看生成的pdf文件
 ```xml
 evince frames.pdf
 ```
