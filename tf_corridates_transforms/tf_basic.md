@@ -83,9 +83,13 @@ target_frame: Rviz中视觉跟踪的frame是 target_frame;
 利用终端的方式实现
 因为`launch`文件不会管各个节点的启动顺序，所以我们可以利用终端的方式来运行。
 首先打开一个终端运行
-`roscore`
+```xml
+roscore
+```
 然后再开一个终端运行静态的坐标转换，格式和launch文件一样。
-`rosrun tf2_ros static_transform_publisher 0 0 1 0 0 0 link1_parent link1`
+```xml
+rosrun tf2_ros static_transform_publisher 0 0 1 0 0 0 link1_parent link1
+```
 
 
 
