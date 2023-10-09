@@ -32,6 +32,23 @@ map到base_link的坐标转换是被定位模块计算出来的. 但定位模块
 fixed_frame: RViz中认定的大世界就是fixed_frame;
 target_frame: Rviz中视觉跟踪的frame是 target_frame;
 
+`
+<launch>  
+    <arg name="model" />  
+    <arg name="gui" default="False" />  
+    <param name="robot_description" textfile="$(arg model)" />  
+    <param name="use_gui" value="$(arg gui)"/>  
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />  
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find sp1s)/urdf.rviz" required="true" />  
+</launch>  `
+
+
+
+
+
+### 
+导航包使用tf来确定机器人在世界中的位置，并将传感器数据与静态地图相关联。然而，tf不提供关于机器人的速度的任何信息。因此，导航包要求任何odometry源通过ROS发布包含速度信息的transform和nav_msgs/Odometry消息。
 
 
 
