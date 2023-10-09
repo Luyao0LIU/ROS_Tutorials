@@ -73,6 +73,7 @@ target_frame: Rviz中视觉跟踪的frame是 target_frame;
 "joint_state_publisher"节点获取urdf里面定义的rotate link并发布坐标转换给tf.否则会显示warning. 注意:“joint_state_publisher” 是python写的，只支持ascii编码，不支持Unicode.
 
 ### TF工具 如何查看当前各个frames之间的转换关系
+
 可以使用ROS官方自带的工具，运行如下命令
 
 **tf_monitor**
@@ -102,10 +103,13 @@ view_frames是可视化的调试工具可以生成pdf文件显示整棵TF树的�
 ```xml
 rosrun tf2_tools view_frames.py
 ```
+
 使用如下命令或者使用pdf阅读器查看生成的pdf文件
+
 ```xml
 evince frames.pdf
 ```
+
 ![image](https://github.com/Luyao0LIU/ROS_Tutorials/assets/128677149/6b56a77e-9e82-4d99-929d-78c49f69c3e8)
 
 
