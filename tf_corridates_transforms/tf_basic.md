@@ -184,6 +184,262 @@ https://zhuanlan.zhihu.com/p/395314257
 <br>
 
 
+```python
+
+# NOTE: This experiment is vel test.
+import rospy, tf2_ros
+from geometry_msgs.msg import PoseStamped, TwistStamped, Vector3Stamped, Vector3, TransformStamped
+from mavros_msgs.msg import State, OverrideRCIn, PositionTarget, AttitudeTarget
+from mavros_msgs.srv import CommandBool, CommandBoolRequest, SetMode, SetModeRequest
+from nav_msgs.msg import Odometry
+from tf.transformations import euler_from_quaternion
+from math import cos, sin, pi
+from sensor_msgs.msg import Image, PointCloud2, PointField
+from cv_bridge import CvBridge, CvBridgeError
+from pointcloud_utils import *
+import cv2 ,math, message_filters
+import pandas as pd
+import open3d as o3d
+import numpy as np
+import scipy.io
+
+# File Path
+read_path='../datasets/export_uav_data_0_05.csv'
+# read_path='../datasets/takeoff_uav_data1.csv'
+uav_data=pd.read_csv(read_path)
+intems=np.array([[337.2084410968044, 0.0, 320.5], [0.0, 337.2084410968044, 240.5], [0.0, 0.0, 1.0]])
+
+# Global variables
+current_pose = PoseStamped()
+current_velocity = TwistStamped()
+current_state = State()
+current_odom=Odometry()
+current_points=PointCloud2()
+
+# TF Transform
+tf_odom_base_link=TransformStamped()
+tf_odom_camera_link=TransformStamped()
+
+
+# Setpoint Position
+desired_pose = PoseStamped()
+desired_pos_target=PositionTarget()
+
+# Set velrity
+desired_vel = TwistStamped()
+
+# Set accelerated
+desired_acc = Vector3Stamped()
+
+#Save Video Config
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+out = cv2.VideoWriter('../videos/s1f_output.avi',fourcc, 15.0, (640,480))
+
+# Callbacks
+def odom_callback(msg):
+    global current_odom
+    current_odom = msg
+
+
+def pose_callback(msg):
+    global current_pose
+    current_pose = msg
+    # rospy.loginfo('current_pose: {:.2f}'.format(current_pose))
+    # print("+++current_pose:  ",current_pose)
+
+# Main function
+def main():
+    rospy.init_node('lly_pub_pointcloud_py')
+
+    # make a video_object and init the video object
+    global count,bridge, start_dep, depth_control
+    start_dep=0
+    depth_control=1
+    count = 0
+    bridge = CvBridge()
+    br = tf2_ros.TransformBroadcaster()
+    br_camera = tf2_ros.TransformBroadcaster()
+    # rospy.Subscriber('/d435/rgb/image_raw', Image, camera_callback)
+    rospy.Subscriber('/d435/depth/image_rect_raw', Image, depth_callback)
+    rospy.Subscriber('/mavros/local_position/odom', Odometry, odom_callback)
+    
+
+    # color=message_filters.Subscriber('/d435/rgb/image_raw', Image)
+    # depth=message_filters.Subscriber('/d435/depth/image_rect_raw', Image)
+    # # color_depth=message_filters.TimeSynchronizer([color, depth], 1) # The absolute time in synchronization
+    # # 设置接近时间同步器 fs等待消息[sub_odom, sub_image]，queue_size 10 和接近时间0.1s，allow_headerless允许非时间戳header.stamp比较，采用ROS时间
+    # color_depth = message_filters.ApproximateTimeSynchronizer([color, depth], 10, 10, allow_headerless=True)
+    # color_depth.registerCallback(camera_callback)
+
+    # rospy.spin()
+    print("************stil run*************")
+
+    # Subscribers
+    rospy.Subscriber('/mavros/local_position/pose', PoseStamped, pose_callback)
+    rospy.Subscriber('/mavros/local_position/velocity_local', TwistStamped, velocity_callback)
+    rospy.Subscriber('/mavros/state', State, state_callback)
+
+    # Publishers
+    local_pos_pub = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped, queue_size=10)
+    local_vel_pub = rospy.Publisher('/mavros/setpoint_velocity/cmd_vel', TwistStamped, queue_size=10)
+    position_target_pub = rospy.Publisher('/mavros/setpoint_raw/local', PositionTarget, queue_size=10)
+    position_acc_pub=rospy.Publisher('/mavros/setpoint_accel/accel', Vector3Stamped, queue_size=10)
+    attitude_pub=rospy.Publisher('/mavros/setpoint_raw/attitude', AttitudeTarget, queue_size=10)
+    pc_pub=rospy.Publisher('pointcloud_pub',PointCloud2, queue_size=10)
+
+    # Service clients
+    set_mode_client = rospy.ServiceProxy('/mavros/set_mode', SetMode)
+    arming_client = rospy.ServiceProxy('/mavros/cmd/arming', CommandBool)
+
+    # Rectangle parameters
+    altitude = 1.5  # Altitude
+    world_corridinate_x=8.5
+    world_corridinate_y=-1.0
+    world_corridinate_z=0.0
+
+    acc_x = 0
+    acc_y = 0
+    acc_z = 0
+
+    vel_x = 0
+    vel_y = 0
+    vel_z = 0
+
+    rate = rospy.Rate(20)  # Update rate
+    # Waypoints (rectangle vertices)
+    # waypoints = [ [-8.5, 1.0], [-8.0, 1.0], [-7.0, 1.0], [-6.0, 1.0], [-5.0, 1.0], [-4.0, 1.0], 
+    #     [-3.0, 1.0], [-2.0, 1.0], [-2.0, 0.0], [-2.0, -1.0], [-1.0, -1.0], [0.0, -1.0], [1.0, -1.0], 
+    #     [2.0, -1.0], [3.0, -1.0], [3.0, 0.0], [3.0, 1.0], [4.0, 1.0], [5.0, 1.0], [6.0, 1.0], 
+    #     [7.0, 1.0], [8.0, 1.0]]
+    # waypoints = [[-8.5, 1.0], [-8.0, 1.0], [-7.0, 1.0], [-6.0, 1.0], [-5.0, 1.0], [-4.0, 1.0], 
+    # [-3.0, 1.0], [-2.0, 1.0]]
+    waypoints = [[-8.5, 1.0]]
+
+    # SET MESSAGE
+    desired_pose.pose.position.x = 0.0
+    desired_pose.pose.position.y = 0.0
+    desired_pose.pose.position.z = altitude
+
+    desired_acc.vector.x=acc_x
+    desired_acc.vector.y=acc_y
+    desired_acc.vector.z=acc_z
+
+    desired_vel.twist.linear.x=vel_x
+    desired_vel.twist.linear.y=vel_y
+    desired_vel.twist.linear.z=vel_z
+
+
+    # Wait for connection
+    while not rospy.is_shutdown() and not current_state.connected:
+        rate.sleep()
+
+    # Send a few setpoints before starting
+    for i in range(100):
+        if(rospy.is_shutdown()):
+            break
+
+        local_pos_pub.publish(desired_pose)
+        rate.sleep()
+
+    offb_set_mode = SetModeRequest()
+    offb_set_mode.custom_mode = 'OFFBOARD'
+
+    arm_cmd = CommandBoolRequest()
+    arm_cmd.value = True
+
+
+    last_req = rospy.Time.now()
+    # Main loop
+    index = 0  # Waypoint index
+    uav_index=0 # uav data index
+    while not rospy.is_shutdown():
+        if(index<len(waypoints)):
+            waypoint_x, waypoint_y = waypoints[index]
+            desired_pose.pose.position.x = waypoint_x+world_corridinate_x
+            desired_pose.pose.position.y = waypoint_y+world_corridinate_y
+            desired_pose.pose.position.z = altitude+world_corridinate_z
+            # New
+            desired_pos_target.position.x=desired_pose.pose.position.x
+            desired_pos_target.position.y=desired_pose.pose.position.y
+            desired_pos_target.position.z=desired_pose.pose.position.z
+            desired_pos_target.coordinate_frame=PositionTarget.FRAME_LOCAL_NED
+            desired_pos_target.type_mask=PositionTarget.IGNORE_VX|PositionTarget.IGNORE_VY|PositionTarget.IGNORE_VZ|PositionTarget.IGNORE_AFX|PositionTarget.IGNORE_AFY|PositionTarget.IGNORE_AFZ|PositionTarget.IGNORE_YAW|PositionTarget.IGNORE_YAW_RATE
+        else:
+            desired_pose.pose.position.x = -8.5+world_corridinate_x
+            desired_pose.pose.position.y = 1.0+world_corridinate_y
+            desired_pose.pose.position.z = altitude+world_corridinate_z
+            index=uav_data.shape[0]+1
+            # pass
+
+        # TF corridates transform
+        tf_odom_base_link.header.frame_id="odom"
+        tf_odom_base_link.child_frame_id="base_link"
+        tf_odom_base_link.header.stamp=rospy.Time.now()
+        tf_odom_base_link.transform.translation.x=current_odom.pose.pose.position.x
+        tf_odom_base_link.transform.translation.y=current_odom.pose.pose.position.y
+        tf_odom_base_link.transform.translation.z=current_odom.pose.pose.position.z
+        tf_odom_base_link.transform.rotation.x=current_odom.pose.pose.orientation.x
+        tf_odom_base_link.transform.rotation.y=current_odom.pose.pose.orientation.y
+        tf_odom_base_link.transform.rotation.z=current_odom.pose.pose.orientation.z
+        tf_odom_base_link.transform.rotation.w=current_odom.pose.pose.orientation.w
+
+        tf_odom_camera_link.header.frame_id="odom"
+        tf_odom_camera_link.child_frame_id="camera_link"
+        tf_odom_camera_link.header.stamp=rospy.Time.now()
+        tf_odom_camera_link.transform.translation.x=current_odom.pose.pose.position.x
+        tf_odom_camera_link.transform.translation.y=current_odom.pose.pose.position.y
+        tf_odom_camera_link.transform.translation.z=current_odom.pose.pose.position.z
+        tf_odom_camera_link.transform.rotation.x=current_odom.pose.pose.orientation.x
+        tf_odom_camera_link.transform.rotation.y=current_odom.pose.pose.orientation.y
+        tf_odom_camera_link.transform.rotation.z=current_odom.pose.pose.orientation.z
+        tf_odom_camera_link.transform.rotation.w=current_odom.pose.pose.orientation.w
+
+        if depth_control==2:
+            pub_current_points=pointcloud_process(current_points,pointtime=rospy.Time.now(), 
+                                              cxyz=pointxyz)
+
+        if(current_state.mode != "OFFBOARD" and (rospy.Time.now() - last_req) > rospy.Duration(5.0)):
+            if(set_mode_client.call(offb_set_mode).mode_sent == True):
+                rospy.loginfo("OFFBOARD enabled")
+
+            last_req = rospy.Time.now()
+        else:
+            if(not current_state.armed and (rospy.Time.now() - last_req) > rospy.Duration(5.0)):
+                if(arming_client.call(arm_cmd).success == True):
+                    rospy.loginfo("Vehicle armed")
+
+                last_req = rospy.Time.now()
+
+        distance_to_waypoint = ((current_pose.pose.position.x - (waypoint_x+world_corridinate_x)) ** 2 +
+                                (current_pose.pose.position.y - (waypoint_y+world_corridinate_y)) ** 2+
+                                (current_pose.pose.position.z - (altitude+world_corridinate_z)) ** 2) ** 0.5
+        # print("++++++++++++++++",distance_to_waypoint)
+        if distance_to_waypoint < 0.1:
+            index += 1  # Move to the next waypoint
+
+        if(index>=len(waypoints)):
+            if(uav_index<uav_data.shape[0]):
+                start_dep=1
+            else: 
+                pass
+        else:
+            pass
+
+        # Publish various topics; Note: the order of publish topics is important.
+        position_target_pub.publish(desired_pos_target)
+        br.sendTransform(tf_odom_base_link)
+        # br_camera.sendTransform(tf_odom_camera_link)
+        if depth_control==2:
+            pc_pub.publish(pub_current_points)
+        rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        main()
+    except rospy.ROSInterruptException:
+        pass
+```
+
 
 
 
