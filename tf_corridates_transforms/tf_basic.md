@@ -47,8 +47,17 @@ target_frame: Rviz中视觉跟踪的frame是 target_frame;
 “robot_description” 参数定义了urdf文件的路径，它被 robot_state_publisher节点使用。该节点解析urdf文件后将各个frame的状态发布给tf. 因此在rviz里面就看到各个frame(link)之间的tf转换显示OK.否则会显示warning.
 "joint_state_publisher"节点获取urdf里面定义的rotate link并发布坐标转换给tf.否则会显示warning. 注意:“joint_state_publisher” 是python写的，只支持ascii编码，不支持Unicode.
 
+### 如何查看当前各个frames之间的转换关系
+可以使用ROS官方自带的工具，运行如下命令
 
+```xml
+rosrun tf2_tools view_frames.py
+```
 
+```xml
+evince frames.pdf
+```
+![image](https://github.com/Luyao0LIU/ROS_Tutorials/assets/128677149/6b56a77e-9e82-4d99-929d-78c49f69c3e8)
 
 
 
@@ -98,8 +107,12 @@ roscore
 rosrun tf2_ros static_transform_publisher 0 0 1 0 0 0 link1_parent link1
 ```
 
+或者
+用tf包工具发布global fixed frame到topic所在坐标系的tf关系，例如：
 
-
+```xml
+rosrun tf static_transform_publisher 0.0 0.0 0.0 0.0 0.0 0.0 map xxx 100 ;//将xxx映射为map
+```
 
 
 ## Reference
