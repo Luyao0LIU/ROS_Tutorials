@@ -20,10 +20,10 @@ https://www.guyuehome.com/35890
 
 **RVIZ坐标系**
 
-X轴--红色 Y轴---绿色 Z轴---蓝色
-YAW(偏航角)绕Z轴旋转
-PITCH(俯仰角)绕Y轴旋转
-ROLL(滚转角)绕X轴旋转
+X轴--红色 Y轴---绿色 Z轴---蓝色<br>
+YAW(偏航角)绕Z轴旋转<br>
+PITCH(俯仰角)绕Y轴旋转<br>
+ROLL(滚转角)绕X轴旋转<br>
 符合右手坐标系原则
 
 
