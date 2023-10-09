@@ -58,12 +58,37 @@ target_frame: Rviz中视觉跟踪的frame是 target_frame;
 
 
 ## (2) 两个相对位置不变的坐标系之间可以采用如下方式进行变换
+**方法1：**
 将以下代码加入到.launch文件中，`args="x y z r p y patent_frame child_frame ms"`， xyz表示子坐标系在父坐标系为参考下的坐标。
 ```xml
 <!-- 坐标系之间关系设置 -->
 <node pkg="tf" type="static_transform_publisher" name="tf_map_odom" args="0 0 0 0 0 0 map odom 100"/>
 <node pkg="tf" type="static_transform_publisher" name="tf_base_camera" args="0 0 0 0 0 0 base_link camera_link 100"/>
 ```
+
+**方法2：**
+有时候后静态转换是固定不变的，我们可以在程序开始运行的时候发布这个静态的转换，例如从标准的相机系到机体系的转换。我们根本就没有必要再写上面这样一段程序，ros为我们提供了现成的包。可以在命令行或者launch文件中实现。终端方式后面讲。
+格式如下：
+`static_transform_publisher x y z yaw pitch roll frame_id child_frame_id`
+还可以通过四元数的方式来实现。
+`static_transform_publisher x y z qx qy qz qw frame_id child_frame_id`
+在相应的launch文件夹内新建一个名为`static_transforms.launch`的launch文件，然后写如下面的内容保存退出。
+```xml
+<launch>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" 
+    args="1 0 0 0 0 0 1 link1_parent link1" />
+</launch>
+```
+**方法3：**
+利用终端的方式实现
+因为`launch`文件不会管各个节点的启动顺序，所以我们可以利用终端的方式来运行。
+首先打开一个终端运行
+`roscore`
+然后再开一个终端运行静态的坐标转换，格式和launch文件一样。
+`rosrun tf2_ros static_transform_publisher 0 0 1 0 0 0 link1_parent link1`
+
+
+
 
 
 ## Reference
