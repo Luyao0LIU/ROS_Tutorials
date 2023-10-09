@@ -31,7 +31,8 @@ odom到base_link的坐标转换是从运动源计算出来广播的。
 map到base_link的坐标转换是被定位模块计算出来的. 但定位模块并不发布map到base_link的转换. 相反它先接受从odom到base_link的转换, 再计算并广播map到odom的位置转换关系。
 fixed_frame: RViz中认定的大世界就是fixed_frame;
 target_frame: Rviz中视觉跟踪的frame是 target_frame;
-‘<launch>  
+
+`<launch>  
 <arg name="model" />  
     <arg name="gui" default="False" />  
     <param name="robot_description" textfile="$(arg model)" />  
@@ -39,7 +40,7 @@ target_frame: Rviz中视觉跟踪的frame是 target_frame;
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />  
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find sp1s)/urdf.rviz" required="true" />  
-</launch>‘
+</launch>`
 
 
 
