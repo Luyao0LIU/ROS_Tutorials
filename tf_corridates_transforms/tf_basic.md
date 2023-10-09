@@ -177,6 +177,16 @@ rosrun tf2_ros static_transform_publisher 0 0 1 0 0 0 link1_parent link1
 rosrun tf static_transform_publisher 0.0 0.0 0.0 0.0 0.0 0.0 map xxx 100 ;//将xxx映射为map
 ```
 
+# (3) 在python文件中定义动态的tf坐标变换
+
+参考：
+https://zhuanlan.zhihu.com/p/395314257
+<br>
+
+
+
+
+
 
 ## Reference
 http://wiki.ros.org/tf2
