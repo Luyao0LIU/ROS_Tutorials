@@ -136,7 +136,29 @@ points_ = np.dot(points_, rotation_matrix) + np.array(cam_wor)
 ![image](https://github.com/Luyao0LIU/ROS_Tutorials/assets/128677149/fdd05f9e-5c24-4957-8bc3-a1f0ce7abeb6)
 
 
+### 本实验中的代码
 
+放在`depth_callback(msg)`回调函数中进行操作
+
+```python
+def depth_callback(msg):
+    global current_depth, depth_control,pointxyz
+    dp_img = bridge.imgmsg_to_cv2(msg, '32FC1')
+    if start_dep and depth_control: # start depth image
+        # print("*****", dp_img.shape) # (480, 640) -- H,W
+        # save_depth4image(dp_img, '../image/depth/2.png')
+        # save_depth4csv(dp_img, '../image/depth_csv/2.csv') # cost a lot of time
+        dxyz=depth2xyz(dp_img, intems, save_point_coor=False,flatten=True)
+        axyz=Abnormal_points_filtering_xyz(dxyz,z_threshold=10, segment_plane=True)
+
+        pointxyz=np.dot(axyz, R_cam2world)
+        # print("*****cxyz_type_shape:", type(cxyz), cxyz.shape) # <class 'numpy.ndarray'> (307200, 3)
+        # *****cxyz_type_shape: <class 'numpy.ndarray'> (480, 640, 3)
+        # save_pointcloud2ply(xyz, save_path='../pointcloud/1.ply')
+        # pointcloud_visual(xyz)
+        depth_control=2
+        # print("*****CTRL + C*****")
+```
 
 
 
