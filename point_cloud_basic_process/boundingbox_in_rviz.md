@@ -19,6 +19,10 @@ https://zhuanlan.zhihu.com/p/432881120
 <br>
 https://blog.csdn.net/mingshili/article/details/124730585
 <br>
+https://wiki.ros.org/rviz/DisplayTypes/Marker#Line_Strip_.28LINE_STRIP.3D4.29
+<br>
+http://docs.ros.org/en/api/visualization_msgs/html/index-msg.html
+<br>
 
 为了方便调用写了一个函数`display_bbox_rviz_xyz`， 包含两种显示方式`CUBE`和`LINE_LIST`，根据输入的`bboxes_xyz`来进行决定，如果是边界框的8的顶点的坐标则显示线条，如果是边界狂的中心点坐标和长宽高和四元数则显示方块。
 
