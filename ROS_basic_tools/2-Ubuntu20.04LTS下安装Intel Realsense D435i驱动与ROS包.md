@@ -12,6 +12,9 @@ https://blog.csdn.net/weixin_41469272/article/details/117919845
 <br>
 https://gitee.com/nie_xun/realsense_ros_gazebo
 <br>
+Ubuntu20.04LTS下安装Intel Realsense D435i驱动与ROS包https://blog.csdn.net/wanghq2013/article/details/123325671
+<br>
+
 
 
  
@@ -70,6 +73,54 @@ E.g:
 sudo apt-get --only-upgrade install  librealsense2-utils librealsense2-dkms
 ```
 
+## 方法2
+（源代码）：
+下载librealsense `git clone https://github.com/IntelRealSense/librealsense.git`，然后进入该目录，运行下列指令安装和编译依赖项：
+```bash
+sudo apt-get install libudev-dev pkg-config libgtk-3-dev
+sudo apt-get install libusb-1.0-0-dev pkg-config
+sudo apt-get install libglfw3-dev
+sudo apt-get install libssl-dev
+
+sudo cp config/99-realsense-libusb.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules && udevadm trigger 
+mkdir build
+cd build
+cmake ../ -DBUILD_EXAMPLES=true
+make
+sudo make install
+```
+测试安装结果
+```bash
+realsense-viewer 
+```
+
+## ROS包安装
+方式一（apt）：
+安装ROS版本的realsense2_camera
+
+```bash
+sudo apt-get install ros-$ROS_DISTRO-realsense2-camera
+sudo apt-get install ros-$ROS_DISTRO-realsense2-description
+```
+方式二（源代码）：
+进入catkin_ws工作空间的src目录，下载realsense和ddynamic_reconfigure，然后用ROS的catkin_make指令编译。
+```bash
+cd ~/catkin_ws/src
+git clone https://github.com/IntelRealSense/realsense-ros.git
+git clone https://github.com/pal-robotics/ddynamic_reconfigure.git
+cd ~/catkin_ws && catkin_make
+```
+安装rgbd-launch
+rgbd_launch是一组打开RGBD设备，并load 所有nodelets转化 raw depth/RGB/IR 流到深度图(depth image), 视差图(disparity image)和点云(point clouds)的launch文件集。
+```bash
+sudo apt-get install ros-noetic-rgbd-launch
+```
+测试编译结果：
+```bash
+roslaunch realsense2_camera demo_pointcloud.launch 
+```
+![image](https://github.com/Luyao0LIU/ROS_Tutorials/assets/128677149/adb7c6f0-ccee-4cb8-a53f-39fa4578d9d8)
 
 
 
