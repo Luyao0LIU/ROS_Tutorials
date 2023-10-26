@@ -18,7 +18,7 @@ Ubuntu20.04LTS下安装Intel Realsense D435i驱动与ROS包https://blog.csdn.net
 
 
  
-## 方法1
+## RealSense的SDK2.0安装-方法1
 ### Installing the packages:
 Register the server's public key:
 ```bash
