@@ -5,7 +5,7 @@ https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linu
 <br>
 
  
-
+## 方法1
 ### Installing the packages:
 Register the server's public key:
 ```bash
