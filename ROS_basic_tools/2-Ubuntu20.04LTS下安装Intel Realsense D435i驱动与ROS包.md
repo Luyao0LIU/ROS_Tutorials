@@ -3,6 +3,16 @@
 Referce:<br>
 https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md#installing-the-packages
 <br>
+https://github.com/IntelRealSense/realsense-ros
+<br>
+https://github.com/amov-lab/Prometheus
+<br>
+realsense D435i gazebo slam(px4)仿真
+https://blog.csdn.net/weixin_41469272/article/details/117919845
+<br>
+https://gitee.com/nie_xun/realsense_ros_gazebo
+<br>
+
 
  
 ## 方法1
