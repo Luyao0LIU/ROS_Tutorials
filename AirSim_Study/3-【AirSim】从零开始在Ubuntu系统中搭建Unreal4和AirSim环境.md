@@ -11,3 +11,8 @@ https://blog.csdn.net/wb175208/article/details/127377212
 
 airsim手动控制无人机-详细搭建过程<br>
 https://blog.csdn.net/qq_31880107/article/details/100112883
+
+AirSim无人机仿真（Ubuntu18.04）添加雷达、相机等各种传感器<br>
+https://blog.csdn.net/qq_33810188/article/details/121913227
+
+
