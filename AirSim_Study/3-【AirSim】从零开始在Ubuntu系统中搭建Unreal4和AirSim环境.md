@@ -9,3 +9,5 @@ https://blog.csdn.net/CSDNhuaong/article/details/78553613?spm=1001.2101.3001.665
 UE4在新的场景中调用AirSim<br>
 https://blog.csdn.net/wb175208/article/details/127377212
 
+airsim手动控制无人机-详细搭建过程<br>
+https://blog.csdn.net/qq_31880107/article/details/100112883
