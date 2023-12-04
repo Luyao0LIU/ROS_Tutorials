@@ -1,6 +1,12 @@
 # pytorch参数初始化两种方法
 
 参考：https://blog.csdn.net/qq_42995479/article/details/120598487
+<br>
+tensorflow和pytorch中的参数初始化调用方法
+https://blog.csdn.net/qq_34218078/article/details/109611105
+<br>
+深度学习中的参数初始化方法：Xavier详细推导+pytorch实现
+https://zhuanlan.zhihu.com/p/648576849
 
 
 ## 初始化方式
